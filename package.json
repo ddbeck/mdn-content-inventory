@@ -7,7 +7,7 @@
     "lint": "npx eslint .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsx scripts/build.mts",
-    "publish": "cd packages && npm publish --dry-run",
+    "publish": "cd package && npm publish",
     "clean": "rm -f package/*.json"
   },
   "author": "Daniel D. Beck <daniel@ddbeck.com> (https://ddbeck.com)",
