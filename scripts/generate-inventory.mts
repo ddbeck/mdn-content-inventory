@@ -4,8 +4,8 @@ import {
   ExecFileSyncOptionsWithStringEncoding,
   execFileSync,
 } from "child_process";
-import { rmSync } from "fs";
-import { relative } from "path";
+import { existsSync, rmSync } from "fs";
+import { join, relative } from "path";
 import { fileURLToPath } from "url";
 import winston from "winston";
 import yargs from "yargs";
@@ -30,6 +30,11 @@ const argv = yargs(process.argv.slice(2))
     type: "count",
     default: 0,
     defaultDescription: "warn",
+  })
+  .option("clean", {
+    describe: "Wipe out repo when finished",
+    type: "boolean",
+    default: false,
   })
   .parseSync();
 
@@ -57,25 +62,33 @@ function main() {
     installDeps();
     inventory();
   } finally {
-    cleanUp();
+    if (argv.clean) {
+      cleanUp();
+    }
   }
 }
 
 function clone(opts: { ref: string; date?: string }) {
   let { ref } = opts;
-  logger.info(`Cloning mdn/content into ${destPath}…`);
-  execFileSync("git", [
-    "clone",
-    "--filter=tree:0",
-    "--quiet",
-    MDNContentRepo,
-    destPath,
-  ]);
+
+  if (!existsSync(destPath) || !existsSync(join(destPath, "/.git"))) {
+    logger.info(`Cloning mdn/content into ${destPath}…`);
+    execFileSync("git", [
+      "clone",
+      "--filter=blob:none",
+      "--quiet",
+      MDNContentRepo,
+      destPath,
+    ]);
+  } else {
+    logger.info(`Reusing existing clone at ${destPath}…`);
+    execFileSync("git", ["fetch", "origin"]);
+  }
 
   if (opts.date) {
     // find commit on ref nearest to date
-    const target = Temporal.Now.instant()
-      .toZonedDateTimeISO("UTC")
+    const target = Temporal.PlainDate.from(opts.date)
+      .toZonedDateTime({ timeZone: "UTC", plainTime: "00:00:01" })
       .startOfDay();
     logger.info(`Looking for commit on ${ref} at ${target.toString()}`);
     const hash = execFileSync(
