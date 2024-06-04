@@ -5,7 +5,7 @@ import winston from "winston";
 import yargs from "yargs";
 
 const argv = yargs(process.argv.slice(2))
-  .scriptName("dist")
+  .scriptName("build")
   .usage("$0", "Generate JSON from MDN content")
   .option("ref", {
     describe:
@@ -41,16 +41,24 @@ const logger = winston.createLogger({
 main();
 
 function main() {
+  const publishDate = Temporal.PlainDate.from(
+    argv.date ?? Temporal.Now.zonedDateTimeISO(),
+  )
+    .toZonedDateTime({ timeZone: "UTC", plainTime: "00:00:01" })
+    .startOfDay();
+
   logger.info("Generating inventory…");
   makeInventoryJSON();
 
   logger.info("Creating package.json…");
-  makePackageJSON();
+  makePackageJSON({ publishDate });
 }
 
 function makeInventoryJSON() {
-  const startOfDay = Temporal.Now.instant()
-    .toZonedDateTimeISO("UTC")
+  const startOfDay = Temporal.PlainDate.from(
+    argv.date ?? Temporal.Now.zonedDateTimeISO(),
+  )
+    .toZonedDateTime({ timeZone: "UTC", plainTime: "00:00:01" })
     .startOfDay();
   const inventory = JSON.stringify(
     JSON.parse(
@@ -73,7 +81,9 @@ function makeInventoryJSON() {
   writeFileSync("package/index.json", inventory, { encoding: "utf8" });
 }
 
-function makePackageJSON() {
+function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
+  const { publishDate } = opts;
+
   const { metadata } = JSON.parse(
     readFileSync("package/index.json", { encoding: "utf-8" }),
   );
@@ -81,12 +91,13 @@ function makePackageJSON() {
   const { name, version, description, author, license } = JSON.parse(
     readFileSync("package.json", { encoding: "utf-8" }),
   );
+
   writeFileSync(
     "package/package.json",
     JSON.stringify(
       {
         name,
-        version: `${version}-${metadata.authorDate.slice(0, 10).replaceAll("-", "")}.${metadata.commitShort}`,
+        version: `${version}-${publishDate.toString().slice(0, 10).replaceAll("-", "")}.${metadata.commitShort}`,
         description,
         author,
         license,
