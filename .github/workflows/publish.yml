@@ -20,6 +20,8 @@ jobs:
       - run: npm ci
 
       - run: npm run build
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - run: npm run publish:dry-run
         env:

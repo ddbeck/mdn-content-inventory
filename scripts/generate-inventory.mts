@@ -49,7 +49,7 @@ const logger = winston.createLogger({
   }),
 });
 
-const MDNContentRepo = "git@github.com:mdn/content.git";
+const MDNContentRepo = "mdn/content";
 const destPath = relative(process.cwd(), ".mdn-content");
 
 function main() {
@@ -73,12 +73,14 @@ function clone(opts: { ref: string; date?: string }) {
 
   if (!existsSync(destPath) || !existsSync(join(destPath, "/.git"))) {
     logger.info(`Cloning mdn/content into ${destPath}…`);
-    execFileSync("git", [
+    execFileSync("gh", [
+      "repo",
       "clone",
-      "--filter=blob:none",
-      "--quiet",
       MDNContentRepo,
       destPath,
+      "--",
+      "--filter=blob:none",
+      "--quiet",
     ]);
   } else {
     logger.info(`Reusing existing clone at ${destPath}…`);
