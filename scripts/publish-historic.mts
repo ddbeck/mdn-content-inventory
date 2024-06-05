@@ -47,10 +47,18 @@ function main() {
       readFileSync("package/index.json", { encoding: "utf-8" }),
     ).metadata.commitShort;
 
+    const forthcomingDate = target.toString().slice(0, 10).replaceAll("-", "");
+    logger.debug(
+      `Attempting to publish for ${forthcomingDate} and ${forthcomingHash}`,
+    );
+
     for (const version of Object.keys(completedReleases())) {
-      if (version.includes(forthcomingHash)) {
+      if (
+        version.includes(forthcomingDate) ||
+        version.includes(forthcomingHash)
+      ) {
         throw new Error(
-          `${forthcomingHash} is already published as ${forthcomingVersion}`,
+          `${forthcomingDate} or ${forthcomingHash} is already published as ${forthcomingVersion}`,
         );
       }
     }
