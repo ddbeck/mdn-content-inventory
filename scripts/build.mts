@@ -1,6 +1,6 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { execFileSync } from "child_process";
-import { readFileSync, writeFileSync } from "fs";
+import { copyFileSync, readFileSync, writeFileSync } from "fs";
 import winston from "winston";
 import yargs from "yargs";
 
@@ -52,6 +52,9 @@ function main() {
 
   logger.info("Creating package.json…");
   makePackageJSON({ publishDate });
+
+  logger.info("Copying readme.md");
+  copyFileSync("readme.md", "package/readme.md");
 }
 
 function makeInventoryJSON() {
