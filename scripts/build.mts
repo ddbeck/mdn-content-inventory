@@ -1,6 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { execFileSync } from "child_process";
 import { copyFileSync, readFileSync, writeFileSync } from "fs";
+import assert from "node:assert";
 import winston from "winston";
 import yargs from "yargs";
 
@@ -20,7 +21,7 @@ const argv = yargs(process.argv.slice(2))
   })
   .option("verbose", {
     alias: "v",
-    describe: "Show more information about calculating the status",
+    describe: "Show more informational messages",
     type: "count",
     default: 0,
     defaultDescription: "warn",
@@ -87,24 +88,27 @@ function makeInventoryJSON() {
 function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
   const { publishDate } = opts;
 
-  const { metadata } = JSON.parse(
-    readFileSync("package/index.json", { encoding: "utf-8" }),
-  );
-
-  const { name, version, description, author, license } = JSON.parse(
+  const { name, version, description, author } = JSON.parse(
     readFileSync("package.json", { encoding: "utf-8" }),
   );
+
+  copyFileSync("LICENSE.txt", "package/LICENSE.txt");
+
+  const [major, minor, patch] = version.split(".");
+  for (const versionPart of [major, minor, patch]) {
+    assert(typeof versionPart === "string");
+  }
 
   writeFileSync(
     "package/package.json",
     JSON.stringify(
       {
         name,
-        version: `${version}-${publishDate.toString().slice(0, 10).replaceAll("-", "")}.${metadata.commitShort}`,
+        version: `${major}.${minor}.${publishDate.toString().slice(0, 10).replaceAll("-", "")}`,
         description,
         author,
-        license,
-        main: "index.js",
+        license: "CC-BY-SA-2.5",
+        main: "index.mjs",
         type: "module",
         scripts: {},
       },
