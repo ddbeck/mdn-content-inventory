@@ -104,7 +104,7 @@ function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
         description,
         author,
         license,
-        main: "index.js",
+        main: "index.mjs",
         type: "module",
         scripts: {},
       },
