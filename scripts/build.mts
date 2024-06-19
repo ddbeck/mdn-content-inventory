@@ -105,7 +105,7 @@ function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
         version: `${major}.${minor}.${publishDate.toString().slice(0, 10).replaceAll("-", "")}`,
         description,
         author,
-        license,
+        license: "CC-BY-SA-2.5",
         main: "index.mjs",
         type: "module",
         scripts: {},
