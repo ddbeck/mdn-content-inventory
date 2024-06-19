@@ -88,9 +88,11 @@ function makeInventoryJSON() {
 function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
   const { publishDate } = opts;
 
-  const { name, version, description, author, license } = JSON.parse(
+  const { name, version, description, author } = JSON.parse(
     readFileSync("package.json", { encoding: "utf-8" }),
   );
+
+  copyFileSync("LICENSE.txt", "package/LICENSE.txt");
 
   const [major, minor, patch] = version.split(".");
   for (const versionPart of [major, minor, patch]) {
@@ -105,7 +107,7 @@ function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
         version: `${major}.${minor}.${publishDate.toString().slice(0, 10).replaceAll("-", "")}`,
         description,
         author,
-        license,
+        license: "CC-BY-SA-2.5",
         main: "index.mjs",
         type: "module",
         scripts: {},
