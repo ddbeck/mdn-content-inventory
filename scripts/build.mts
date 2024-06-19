@@ -20,7 +20,7 @@ const argv = yargs(process.argv.slice(2))
   })
   .option("verbose", {
     alias: "v",
-    describe: "Show more information about calculating the status",
+    describe: "Show more informational messages",
     type: "count",
     default: 0,
     defaultDescription: "warn",
