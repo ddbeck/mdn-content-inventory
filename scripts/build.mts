@@ -88,9 +88,11 @@ function makeInventoryJSON() {
 function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
   const { publishDate } = opts;
 
-  const { name, version, description, author, license } = JSON.parse(
+  const { name, version, description, author } = JSON.parse(
     readFileSync("package.json", { encoding: "utf-8" }),
   );
+
+  copyFileSync("LICENSE.txt", "package/LICENSE.txt");
 
   const [major, minor, patch] = version.split(".");
   for (const versionPart of [major, minor, patch]) {
