@@ -5,7 +5,7 @@
   "main": "src/index.mts",
   "scripts": {
     "lint": "npx eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx tsc --noEmit",
     "build": "npx tsx scripts/build.mts",
     "publish": "cd package && npm publish",
     "publish:dry-run": "cd package && npm publish --dry-run",
