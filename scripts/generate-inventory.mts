@@ -4,7 +4,7 @@ import {
   ExecFileSyncOptionsWithStringEncoding,
   execFileSync,
 } from "child_process";
-import { existsSync, rmSync } from "fs";
+import { existsSync, readFileSync, rmSync } from "fs";
 import { join, relative } from "path";
 import { fileURLToPath } from "url";
 import winston from "winston";
@@ -164,10 +164,27 @@ function inventory() {
     .toZonedDateTimeISO("UTC")
     .toString();
 
+  const redirects = (() => {
+    const file = readFileSync(`${destPath}/files/en-us/_redirects.txt`, "utf8");
+    const lines = file.split("\n");
+    const redirectLines = lines.filter(
+      (line) => line.startsWith("/") && line.includes("\t"),
+    );
+    const redirectMap = new Map<string, string>();
+    for (const redirectLine of redirectLines) {
+      const [source, target] = redirectLine.split("\t", 2);
+      if (source && target) {
+        redirectMap.set(source, target);
+      }
+    }
+    return Object.fromEntries(redirectMap);
+  })();
+
   console.log(
     JSON.stringify({
       metadata: { commit, commitShort, authorDate },
       inventory,
+      redirects,
     }),
   );
 }
