@@ -11,6 +11,10 @@
     "publish:dry-run": "cd package && npm publish --dry-run",
     "clean": "rm -f package/*.json"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ddbeck/mdn-content-inventory.git"
+  },
   "author": "Daniel D. Beck <daniel@ddbeck.com> (https://ddbeck.com)",
   "license": "Apache-2.0",
   "private": "true",
