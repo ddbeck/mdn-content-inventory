@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: "58 5 * * *"
   workflow_dispatch:
+    inputs:
+      ref:
+        description: mdn/content commit to publish a release from
+        required: false
+        type: string
+      dryRun:
+        description: Don't actually publish to npm
+        required: false
+        type: boolean
 
 jobs:
   publish:
@@ -19,11 +28,23 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run build
+      - run: |
+          if [ -n "$REF" ]; then
+            npm run build -- --ref="$REF"
+          else
+            npm run build
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
+          REF: ${{ inputs.ref }}
 
-      - run: npm run publish
+      - if: ${{ inputs.dryRun }}
+        run: npm run publish:dry-run
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - if: ${{ ! inputs.dryRun }}
+        run: npm run publish:dry-run
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

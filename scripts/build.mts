@@ -64,22 +64,22 @@ function makeInventoryJSON() {
   )
     .toZonedDateTime({ timeZone: "UTC", plainTime: "00:00:01" })
     .startOfDay();
+
+  const generateCommand = "npx";
+  const generateCommandOptions = [
+    "tsx",
+    "./scripts/generate-inventory.mts",
+    "--verbose",
+    argv.ref ? `--ref=${argv.ref}` : `--date=${startOfDay.toString()}`,
+  ];
+
   const inventory = JSON.stringify(
     JSON.parse(
-      execFileSync(
-        "npx",
-        [
-          "tsx",
-          "./scripts/generate-inventory.mts",
-          "--verbose",
-          `--date=${startOfDay.toString()}`,
-        ],
-        {
-          encoding: "utf8",
-          stdio: ["ignore", "pipe", "inherit"],
-          maxBuffer: 1024 * 1024 * 5,
-        },
-      ),
+      execFileSync(generateCommand, generateCommandOptions, {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "inherit"],
+        maxBuffer: 1024 * 1024 * 5,
+      }),
     ),
   );
   writeFileSync("package/index.json", inventory, { encoding: "utf8" });
