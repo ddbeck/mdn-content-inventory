@@ -32,7 +32,7 @@ jobs:
           if [ -n "$REF" ]; then
             npm run build -- --verbose --ref="$REF"
           else
-            npm run build
+            npm run build -- --verbose
           fi
         env:
           GH_TOKEN: ${{ github.token }}
