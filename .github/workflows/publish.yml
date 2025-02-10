@@ -30,7 +30,7 @@ jobs:
 
       - run: |
           if [ -n "$REF" ]; then
-            npm run build -- --ref="$REF"
+            npm run build -- --verbose --ref="$REF"
           else
             npm run build
           fi
