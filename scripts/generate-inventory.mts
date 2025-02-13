@@ -121,6 +121,14 @@ function installDeps() {
     encoding: "utf-8",
     stdio: "ignore",
   });
+
+  logger.info("Working around rari stdout pollution …");
+  // TODO: remove me when https://github.com/mdn/rari/issues/131 is fixed
+  execFileSync("yarn", ["--silent", "content", "validate-redirects"], {
+    cwd: destPath,
+    encoding: "utf-8",
+    stdio: "ignore",
+  });
 }
 
 function inventory() {
