@@ -132,7 +132,7 @@ function inventory() {
 
   logger.info("Generating content inventory…");
   const inventory = JSON.parse(
-    execFileSync("yarn", ["--silent", "run", "content", "inventory"], {
+    execFileSync("yarn", ["--silent", "run", "content", "--quiet", "inventory"], {
       ...readOpts,
       maxBuffer: 1024 * 1024 * 5,
     }),
