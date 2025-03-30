@@ -8,6 +8,17 @@ import yargs from "yargs";
 const argv = yargs(process.argv.slice(2))
   .scriptName("publish-historic")
   .usage("$0", "Publish historic releases")
+  .option("dry-run", {
+    alias: "n",
+    describe: "Don't actually publish to npm",
+    type: "boolean",
+    default: true,
+  })
+  .option("continue", {
+    describe: "Continue to the next release, if a release already exists",
+    type: "boolean",
+    default: false,
+  })
   .option("verbose", {
     alias: "v",
     describe: "Show more information about calculating the status",
@@ -49,23 +60,34 @@ function main() {
 
     const forthcomingDate = target.toString().slice(0, 10).replaceAll("-", "");
     logger.debug(
-      `Attempting to publish for ${forthcomingDate} and ${forthcomingHash}`,
+      `Attempting to publish for ${forthcomingDate} and ${forthcomingHash} as ${forthcomingVersion}`,
     );
 
+    let alreadyPublished: false | string = false;
     for (const version of Object.keys(completedReleases())) {
       if (
         version.includes(forthcomingDate) ||
         version.includes(forthcomingHash)
       ) {
-        throw new Error(
-          `${forthcomingDate} or ${forthcomingHash} is already published as ${forthcomingVersion}`,
-        );
+        alreadyPublished = `${forthcomingDate} or ${forthcomingHash} is already published as ${forthcomingVersion}`;
       }
     }
 
-    npmRun("publish");
-    npmRun("clean");
+    if (alreadyPublished) {
+      if (argv.continue) {
+        logger.warn(`${alreadyPublished}; skipping this release`);
+      } else {
+        throw new Error(alreadyPublished);
+      }
+    } else {
+      if (argv.dryRun) {
+        npmRun("publish:dry-run");
+      } else {
+        npmRun("publish");
+      }
+    }
 
+    npmRun("clean");
     target = target.add({ days: 1 });
   }
 }

@@ -113,6 +113,7 @@ export class Inventory {
       cwd: this.destPath,
       encoding: "utf-8",
       stdio: "ignore",
+      env: { ...process.env, CI: "true" },
     });
   }
 
