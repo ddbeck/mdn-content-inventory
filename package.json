@@ -4,7 +4,7 @@
   "description": "The MDN page inventory as a big JSON object.",
   "main": "src/index.mts",
   "scripts": {
-    "lint": "npx eslint .",
+    "lint": "npx eslint . --ignore-pattern '.mdn-content/*'",
     "test": "npx tsc --noEmit",
     "build": "npx tsx scripts/build.mts",
     "publish": "cd package && npm publish",

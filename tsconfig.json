@@ -7,5 +7,5 @@
     "noPropertyAccessFromIndexSignature": false,
     "outDir": "./dist"
   },
-  "include": ["./scripts/**/*.mts", "./package/index.mjs"]
+  "include": ["./lib/*.mts", "./package/index.mjs", "./scripts/*.mts"]
 }

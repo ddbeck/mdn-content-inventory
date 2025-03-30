@@ -1,9 +1,9 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { execFileSync } from "child_process";
 import { copyFileSync, readFileSync, writeFileSync } from "fs";
 import assert from "node:assert";
 import winston from "winston";
 import yargs from "yargs";
+import { Inventory } from "../lib/inventory.mjs";
 
 const argv = yargs(process.argv.slice(2))
   .scriptName("build")
@@ -39,9 +39,9 @@ const logger = winston.createLogger({
   }),
 });
 
-main();
+await main();
 
-function main() {
+async function main() {
   const publishDate = Temporal.PlainDate.from(
     argv.date ?? Temporal.Now.zonedDateTimeISO(),
   )
@@ -49,7 +49,7 @@ function main() {
     .startOfDay();
 
   logger.info("Generating inventory…");
-  makeInventoryJSON();
+  await makeInventoryJSON();
 
   logger.info("Creating package.json…");
   makePackageJSON({ publishDate });
@@ -58,31 +58,21 @@ function main() {
   copyFileSync("readme.md", "package/readme.md");
 }
 
-function makeInventoryJSON() {
+async function makeInventoryJSON() {
   const startOfDay = Temporal.PlainDate.from(
     argv.date ?? Temporal.Now.zonedDateTimeISO(),
   )
     .toZonedDateTime({ timeZone: "UTC", plainTime: "00:00:01" })
     .startOfDay();
 
-  const generateCommand = "npx";
-  const generateCommandOptions = [
-    "tsx",
-    "./scripts/generate-inventory.mts",
-    "--verbose",
-    argv.ref ? `--ref=${argv.ref}` : `--date=${startOfDay.toString()}`,
-  ];
+  const inv = new Inventory({ logger });
+  await inv.init(argv.ref, startOfDay.toString());
 
-  const inventory = JSON.stringify(
-    JSON.parse(
-      execFileSync(generateCommand, generateCommandOptions, {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "inherit"],
-        maxBuffer: 1024 * 1024 * 5,
-      }),
-    ),
+  writeFileSync(
+    "package/index.json",
+    JSON.stringify(inv.toObject(), undefined),
+    { encoding: "utf8" },
   );
-  writeFileSync("package/index.json", inventory, { encoding: "utf8" });
 }
 
 function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
