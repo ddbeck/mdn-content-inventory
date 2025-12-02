@@ -14,17 +14,30 @@ on:
         required: false
         type: boolean
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   publish:
+    name: Publish to npm
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # trusted publishing + attestations
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
           node-version-file: ".tool-versions"
           registry-url: "https://registry.npmjs.org"
+
+      - run: npm install -g 'npm@>=11.5.1'  # required for trusted publishing
 
       - run: npm ci
 
@@ -40,12 +53,8 @@ jobs:
 
       - if: ${{ inputs.dryRun }}
         run: npm run publish:dry-run
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - if: ${{ ! inputs.dryRun }}
         run: npm run publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - run: npm info @ddbeck/mdn-content-inventory
