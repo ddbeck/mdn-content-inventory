@@ -109,7 +109,7 @@ export class Inventory {
 
   installDeps() {
     this.logger.info("Installing dependencies…");
-    execFileSync("yarn", ["--silent"], {
+    execFileSync("npm", ["ci"], {
       cwd: this.destPath,
       encoding: "utf-8",
       stdio: "ignore",
@@ -119,8 +119,8 @@ export class Inventory {
 
   loadInventory(): Promise<number | null> {
     const process = spawn(
-      "yarn",
-      ["--silent", "run", "content", "--quiet", "inventory"],
+      "npm",
+      ["--silent", "run", "content", "--", "inventory", "--quiet"],
       { cwd: this.destPath },
     );
 
