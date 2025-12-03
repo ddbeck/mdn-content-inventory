@@ -78,7 +78,7 @@ async function makeInventoryJSON() {
 function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
   const { publishDate } = opts;
 
-  const { name, version, description, author } = JSON.parse(
+  const { name, version, description, repository, author } = JSON.parse(
     readFileSync("package.json", { encoding: "utf-8" }),
   );
 
@@ -96,6 +96,7 @@ function makePackageJSON(opts: { publishDate: Temporal.ZonedDateTime }) {
         name,
         version: `${major}.${minor}.${publishDate.toString().slice(0, 10).replaceAll("-", "")}`,
         description,
+        repository,
         author,
         license: "CC-BY-SA-2.5",
         main: "index.mjs",
