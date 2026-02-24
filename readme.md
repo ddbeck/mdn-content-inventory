@@ -1,3 +1,5 @@
+DO NOT MERGE THIS PR
+
 # [@ddbeck/mdn-content-inventory](https://github.com/ddbeck/mdn-content-inventory)
 
 `@ddbeck/mdn-content-inventory` is [MDN Web Docs content](https://github.com/mdn/content) metadata as a package.
