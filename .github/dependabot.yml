@@ -6,6 +6,12 @@ updates:
       interval: "weekly"
     cooldown:
       default-days: 28
+    groups:
+      npm:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -13,3 +19,9 @@ updates:
       interval: "weekly"
     cooldown:
       default-days: 28
+    groups:
+      github-actions:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
