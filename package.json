@@ -34,7 +34,7 @@
     "prettier": "^3.3.0",
     "tsx": "^4.11.2",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.12.0",
+    "typescript-eslint": "^8.59.3",
     "winston": "^3.13.0",
     "yargs": "^17.7.2"
   }
